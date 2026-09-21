@@ -1,0 +1,6 @@
+# Local secrets
+.env
+
+# .NET Core
+bin/
+obj/
