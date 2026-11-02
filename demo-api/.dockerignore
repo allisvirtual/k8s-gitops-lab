@@ -1,0 +1,9 @@
+**/bin/
+**/obj/
+
+# Tests run in CI, not in the image build.
+DemoApi.Tests/
+
+*.sln
+Dockerfile
+.dockerignore

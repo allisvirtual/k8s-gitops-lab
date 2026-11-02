@@ -58,8 +58,74 @@ Everything written about the project lives in [`docs/`](docs/).
 
 ## Getting started
 
-Not yet available. Prerequisites and the setup, deploy, rollback, rebuild and
-tear-down steps land in the runbook as the platform is built.
+Early days: the API, its container image and the local cluster exist. There is
+no Helm chart, no CI pipeline and no ArgoCD yet, so nothing is deployed to
+Kubernetes automatically. The rollback, rebuild and tear-down steps land in the
+runbook as those parts are built.
+
+### Prerequisites
+
+| Tool | Check with | Needed for |
+| --- | --- | --- |
+| .NET SDK 9.0 | `dotnet --version` | building and testing the API |
+| Docker Desktop, Linux containers | `docker version` | building the image, running k3d |
+| k3d | `k3d version` | the local cluster |
+| kubectl | `kubectl version --client` | talking to the cluster |
+
+On Windows, k3d installs with `winget install k3d.k3d`.
+
+### Run the API on its own
+
+```
+dotnet test demo-api/DemoApi.sln
+dotnet run --project demo-api/DemoApi
+```
+
+Three endpoints, on the port `dotnet run` prints:
+
+| Endpoint | Returns |
+| --- | --- |
+| `/health` | `Healthy`, or 503 when the `BreakHealth` flag is set |
+| `/version` | the deployed build, as `{"version":"..."}` |
+| `/metrics` | Prometheus text format |
+
+`/version` is what the measurement scripts poll to detect that a release is
+live. It reports `DEMO_API_VERSION` if that is set, otherwise the version baked
+in at build time, otherwise `0.0.0-dev`.
+
+`BreakHealth=true` makes `/health` fail on purpose. That is how the recovery
+measurement gets a broken release to recover from.
+
+Metrics come from `prometheus-net.AspNetCore`, chosen over the OpenTelemetry SDK
+because two lines of setup give a working scrape endpoint, and this experiment
+measures delivery rather than telemetry. Swapping it later touches one file.
+
+### Build and run the container
+
+```
+docker build -t demo-api:0.1.0 --build-arg VERSION=0.1.0 demo-api
+docker run --rm -p 8081:8080 demo-api:0.1.0
+```
+
+`VERSION` is what `/version` will report. The image runs as a non-root user.
+
+### Create and delete the local cluster
+
+```
+./infra/local/cluster-up.ps1
+./infra/local/cluster-down.ps1
+```
+
+`cluster-up.ps1` prints how long creation took, which is an input for the
+rebuild metric. The cluster is described by
+[`infra/local/k3d-cluster.yaml`](infra/local/k3d-cluster.yaml) so it can be
+recreated identically before a measurement run.
+
+To get the image into the cluster before a Helm chart exists:
+
+```
+k3d image import demo-api:0.1.0 -c gitops-lab
+```
 
 ## Context
 

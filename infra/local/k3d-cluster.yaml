@@ -1,0 +1,37 @@
+# The local experiment cluster, described in full so it can be thrown away and
+# recreated identically before every measurement run.
+#
+#   ./cluster-up.ps1     creates it and prints how long that took
+#   ./cluster-down.ps1   deletes it
+#
+# Docs: https://k3d.io/stable/usage/configfile/
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+
+metadata:
+  name: gitops-lab
+
+servers: 1
+agents: 1
+
+# TODO: pin the k3s image so that every rebuild uses the same Kubernetes
+# version and a k3d upgrade cannot quietly change the cluster underneath the
+# measurements. Run "k3d version" to see the default it ships with, then set
+# it here, for example:
+#   image: rancher/k3s:v1.31.5-k3s1
+
+ports:
+  # k3s ships Traefik as its ingress controller on port 80 inside the cluster.
+  # This publishes it on http://localhost:8080 through the k3d load balancer.
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+
+options:
+  k3d:
+    # Do not return until the server is actually accepting connections.
+    wait: true
+    timeout: 120s
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: true
