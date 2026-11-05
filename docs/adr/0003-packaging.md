@@ -24,8 +24,8 @@ on that path is one of the measured quantities.
 
 Helm. One chart in `config/charts/demo-api/`, with defaults in its
 `values.yaml` and one values file per environment in `config/values/`
-(currently `k3d.yaml`). The push path runs
-`helm upgrade --install demo-api config/charts/demo-api -f config/values/k3d.yaml`,
+(currently `local.yaml`). The push path runs
+`helm upgrade --install demo-api config/charts/demo-api -f config/values/local.yaml`,
 and the ArgoCD Application will point at the same chart path and values file.
 
 The chart lives in `config/` rather than in `demo-api/chart/`. In the GitOps

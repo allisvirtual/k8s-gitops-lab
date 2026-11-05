@@ -13,7 +13,7 @@ spec:
     helm:
       releaseName: demo-api
       valueFiles:
-        - ../../values/k3d.yaml
+        - ../../values/local.yaml
       # Separate host so it can run next to the push release on localhost:8080.
       valuesObject:
         ingress:

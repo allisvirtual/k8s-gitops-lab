@@ -126,7 +126,7 @@ recreated identically before a measurement run.
 ### Deploy to the cluster
 
 The chart is [`config/charts/demo-api/`](config/charts/demo-api/), and
-[`config/values/k3d.yaml`](config/values/k3d.yaml) holds the values for the
+[`config/values/local.yaml`](config/values/local.yaml) holds the values for the
 local cluster. Both delivery paths will use exactly these files (see
 [ADR-003](docs/adr/0003-packaging.md)).
 
@@ -136,7 +136,7 @@ cluster yourself:
 ```
 docker build -t demo-api:0.1.0 --build-arg VERSION=0.1.0 demo-api
 k3d image import demo-api:0.1.0 -c gitops-lab
-helm upgrade --install demo-api config/charts/demo-api -f config/values/k3d.yaml --wait
+helm upgrade --install demo-api config/charts/demo-api -f config/values/local.yaml --wait
 curl http://localhost:8080/version
 ```
 
@@ -150,7 +150,7 @@ Build and import a new tag, then upgrade with that tag:
 ```
 docker build -t demo-api:0.2.0 --build-arg VERSION=0.2.0 demo-api
 k3d image import demo-api:0.2.0 -c gitops-lab
-helm upgrade demo-api config/charts/demo-api -f config/values/k3d.yaml --set image.tag=0.2.0 --wait
+helm upgrade demo-api config/charts/demo-api -f config/values/local.yaml --set image.tag=0.2.0 --wait
 ```
 
 The rollout replaces one pod at a time and never removes a pod before its
@@ -160,7 +160,7 @@ errors in between.
 ### Deploy a broken release and roll back
 
 ```
-helm upgrade demo-api config/charts/demo-api -f config/values/k3d.yaml --set image.tag=0.2.0 --set breakHealth=true --wait --timeout 60s
+helm upgrade demo-api config/charts/demo-api -f config/values/local.yaml --set image.tag=0.2.0 --set breakHealth=true --wait --timeout 60s
 ```
 
 The new pod fails its readiness probe on `/health`, so it never receives
@@ -203,7 +203,7 @@ Open the UI with the port-forward and password command the script prints, then
 go to `http://localhost:8090` and log in as `admin`.
 
 **Deploy by pushing.** Change `image.tag` in
-[`config/values/k3d.yaml`](config/values/k3d.yaml), commit and push to
+[`config/values/local.yaml`](config/values/local.yaml), commit and push to
 `master`. ArgoCD checks Git every 2 to 3 minutes; press Refresh in the UI to
 check right away.
 
