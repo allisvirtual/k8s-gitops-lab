@@ -64,9 +64,11 @@ deleted by the two scripts next to it.
   validity, since the local and cloud clusters are not the same distribution.
 - The cluster is disposable, and `cluster-up.ps1` prints its own creation time.
   That number feeds the rebuild metric directly and needs no separate script.
-- The k3s image version is not pinned yet. It must be pinned in the config
-  before the first real measurement run, otherwise a k3d upgrade changes the
-  Kubernetes version between runs and the runs stop being comparable.
+- The k3s image is pinned in the config (`rancher/k3s:v1.34.12-k3s1`),
+  otherwise a k3d upgrade changes the Kubernetes version between runs and the
+  runs stop being comparable. Leaving it unpinned already broke the cluster
+  once: k3d 5.9 defaults to k3s 1.35, whose kubelet refuses to start on the
+  cgroup v1 that Docker Desktop on WSL2 runs, so the agent node never joined.
 - The cluster runs on Docker Desktop on the development machine, so measurements
   share hardware with editors, browsers and builds. Runs are done with no other
   heavy work in progress, and this is named as a source of noise in the results.

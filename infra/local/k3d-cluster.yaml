@@ -14,11 +14,11 @@ metadata:
 servers: 1
 agents: 1
 
-# TODO: pin the k3s image so that every rebuild uses the same Kubernetes
-# version and a k3d upgrade cannot quietly change the cluster underneath the
-# measurements. Run "k3d version" to see the default it ships with, then set
-# it here, for example:
-#   image: rancher/k3s:v1.31.5-k3s1
+# Pinned so that every rebuild uses the same Kubernetes version and a k3d
+# upgrade cannot quietly change the cluster underneath the measurements.
+# Stays on 1.34: from 1.35 the kubelet refuses to start on cgroup v1, which is
+# what Docker Desktop on WSL2 still runs here.
+image: rancher/k3s:v1.34.12-k3s1
 
 ports:
   # k3s ships Traefik as its ingress controller on port 80 inside the cluster.

@@ -1,0 +1,51 @@
+# Defaults that hold for every environment. Per environment overrides live in
+# config/values/<environment>.yaml and are passed with -f.
+
+replicaCount: 2
+
+image:
+  repository: demo-api
+  # Empty means the chart's appVersion.
+  tag: ""
+  pullPolicy: IfNotPresent
+
+# Sets the BreakHealth flag in the API, which makes /health return 503. Used
+# only to create a deliberately broken release for the recovery measurement.
+breakHealth: false
+
+service:
+  port: 80
+
+ingress:
+  enabled: true
+  # Left empty here because the ingress controller differs per cluster (Traefik
+  # on k3d). Setting it in the environment file keeps the templates free of
+  # distribution specific fields.
+  className: ""
+  # Empty host matches every host name, so the API answers on plain localhost.
+  host: ""
+
+# Both probes hit /health. A failing readiness probe keeps a broken pod out of
+# the Service, and with maxUnavailable 0 the rollout stalls while the old pods
+# keep serving.
+probes:
+  readiness:
+    initialDelaySeconds: 2
+    periodSeconds: 2
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 3
+
+# How long a pod keeps serving after it is told to stop, so the ingress has
+# time to stop sending it traffic. Without it a rollout drops a few requests.
+shutdownDelaySeconds: 5
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi

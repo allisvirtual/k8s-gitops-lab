@@ -1,0 +1,13 @@
+# Values for the local k3d cluster. Used by both the push pipeline and ArgoCD,
+# so a change here is a deployment.
+#
+#   helm upgrade --install demo-api config/charts/demo-api -f config/values/k3d.yaml
+
+image:
+  # Built locally and loaded with "k3d image import" until CI pushes to GHCR.
+  repository: demo-api
+  tag: "0.1.0"
+
+ingress:
+  # k3s ships Traefik as its ingress controller.
+  className: traefik

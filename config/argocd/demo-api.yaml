@@ -1,0 +1,38 @@
+# The GitOps setup: ArgoCD keeps the demo API in the cluster identical to the
+# chart and values on master. A commit here is a deployment, and a manual
+# change in the cluster is reverted.
+#
+# Applied once by infra/local/argocd-up.ps1. After that, deploying means
+# pushing to master.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-api
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/allisvirtual/k8s-gitops-lab.git
+    targetRevision: master
+    path: config/charts/demo-api
+    helm:
+      releaseName: demo-api
+      # The same values file the push path uses, so both deploy the same thing.
+      valueFiles:
+        - ../../values/k3d.yaml
+      # Only routing differs: the push release answers on localhost:8080, this
+      # one on gitops.localhost:8080, so both can run side by side.
+      valuesObject:
+        ingress:
+          host: gitops.localhost
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops
+  syncPolicy:
+    automated:
+      # Delete resources that were removed from Git.
+      prune: true
+      # Revert manual changes made in the cluster.
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
