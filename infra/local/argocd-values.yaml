@@ -1,17 +1,11 @@
-# Values for the ArgoCD Helm chart (argo/argo-cd). Kept as a file so the AKS
-# install through Terraform (KAN-37) can reuse it unchanged.
-#
-# Git polling is left at the chart default (every 120s plus up to 60s jitter).
-# That delay is part of what the lead time measurement compares, so it is not
-# tuned here.
+# Git polling stays at the chart default (120s plus up to 60s jitter), since it
+# is part of what the lead time measurement compares.
 
 configs:
   params:
-    # Serve the UI over plain HTTP. It is only reached through a local
-    # port-forward, so TLS would add a certificate warning and nothing else.
+    # Plain HTTP, the UI is only reached through a local port-forward.
     server.insecure: true
 
-# Single sign-on and notifications are not used in this experiment.
 dex:
   enabled: false
 notifications:

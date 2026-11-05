@@ -8,36 +8,27 @@ builder.Services.AddHealthChecks().AddCheck<BreakableHealthCheck>("self");
 
 var app = builder.Build();
 
-// Counts and times every request, so /metrics has something to report.
 app.UseHttpMetrics();
 
-// Liveness and readiness for the Kubernetes probes.
 app.MapHealthChecks("/health");
 
-// The endpoint the measurement scripts poll to see that a release is live.
 app.MapGet("/version", () => Results.Json(new { version = ResolveVersion() }));
 
-// Prometheus scrape target.
 app.MapMetrics();
 
 app.Run();
 
-// DEMO_API_VERSION wins so that Helm can set the version without a rebuild.
-// Otherwise the value baked in at build time is used.
+// DEMO_API_VERSION overrides the version baked in at build time.
 static string ResolveVersion() =>
     Environment.GetEnvironmentVariable("DEMO_API_VERSION")
     ?? Assembly.GetExecutingAssembly()
         .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
     ?? "0.0.0-dev";
 
-// Top-level statements compile to an internal Program class. This makes it
-// public so the test project can use WebApplicationFactory<Program>.
+// Public so the tests can use WebApplicationFactory<Program>.
 public partial class Program;
 
-/// <summary>
-/// Healthy unless BreakHealth is set. Setting it is how the recovery
-/// measurement gets a deliberately broken release to recover from.
-/// </summary>
+// Unhealthy when BreakHealth is set, to simulate a broken release.
 internal sealed class BreakableHealthCheck(IConfiguration configuration) : IHealthCheck
 {
     public Task<HealthCheckResult> CheckHealthAsync(

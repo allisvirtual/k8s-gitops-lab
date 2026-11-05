@@ -1,14 +1,7 @@
 #Requires -Version 7
 <#
 .SYNOPSIS
-    Creates the local k3d cluster from k3d-cluster.yaml.
-
-.DESCRIPTION
-    Prints how long creation took. That number is the first input for the
-    rebuild metric, so note it down when you run this for a measurement.
-
-.EXAMPLE
-    ./cluster-up.ps1
+    Creates the local k3d cluster and prints how long it took (input for the rebuild metric).
 #>
 
 $ErrorActionPreference = 'Stop'

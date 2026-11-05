@@ -2,14 +2,6 @@
 <#
 .SYNOPSIS
     Deletes the local k3d cluster.
-
-.DESCRIPTION
-    The cluster is disposable on purpose. Deleting and recreating it is what
-    the rebuild measurement times, and it is also the quickest way back to a
-    clean state after a drift or recovery experiment.
-
-.EXAMPLE
-    ./cluster-down.ps1
 #>
 
 $ErrorActionPreference = 'Stop'

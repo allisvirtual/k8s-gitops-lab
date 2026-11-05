@@ -12,8 +12,7 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      # Never take a working pod away before its replacement is Ready, so a
-      # broken release cannot cause downtime on its own.
+      # Keep old pods until the new one is Ready, so a broken release causes no downtime.
       maxUnavailable: 0
       maxSurge: 1
   template:
@@ -43,9 +42,6 @@ spec:
               path: /health
               port: http
             {{- toYaml .Values.probes.liveness | nindent 12 }}
-          # Removing a pod from the endpoints and stopping it happen at the
-          # same time, and the ingress keeps routing to it until it notices.
-          # Waiting before shutdown lets those last requests still be served.
           lifecycle:
             preStop:
               sleep:

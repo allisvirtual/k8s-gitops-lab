@@ -1,10 +1,3 @@
-# The local experiment cluster, described in full so it can be thrown away and
-# recreated identically before every measurement run.
-#
-#   ./cluster-up.ps1     creates it and prints how long that took
-#   ./cluster-down.ps1   deletes it
-#
-# Docs: https://k3d.io/stable/usage/configfile/
 apiVersion: k3d.io/v1alpha5
 kind: Simple
 
@@ -14,22 +7,18 @@ metadata:
 servers: 1
 agents: 1
 
-# Pinned so that every rebuild uses the same Kubernetes version and a k3d
-# upgrade cannot quietly change the cluster underneath the measurements.
-# Stays on 1.34: from 1.35 the kubelet refuses to start on cgroup v1, which is
-# what Docker Desktop on WSL2 still runs here.
+# Pinned for reproducible rebuilds. 1.35 and later refuse to start on the
+# cgroup v1 that Docker Desktop on WSL2 runs here.
 image: rancher/k3s:v1.34.12-k3s1
 
 ports:
-  # k3s ships Traefik as its ingress controller on port 80 inside the cluster.
-  # This publishes it on http://localhost:8080 through the k3d load balancer.
+  # Traefik, the k3s ingress controller, on http://localhost:8080.
   - port: 8080:80
     nodeFilters:
       - loadbalancer
 
 options:
   k3d:
-    # Do not return until the server is actually accepting connections.
     wait: true
     timeout: 120s
   kubeconfig:

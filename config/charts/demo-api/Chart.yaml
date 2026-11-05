@@ -1,15 +1,6 @@
-# The one deployment definition for the demo API. The push pipeline runs
-# "helm upgrade" with it and ArgoCD renders it, unchanged in both cases, so the
-# delivery path is the only thing that differs between the two setups.
-#
-# Environment specific values live next to it in config/values/.
 apiVersion: v2
 name: demo-api
 description: .NET minimal API used to compare push-based and pull-based delivery.
 type: application
-
-# Version of the chart itself. Bump it when a template changes.
 version: 0.1.0
-
-# Default image tag when image.tag is not set. CI overrides the tag per release.
 appVersion: "0.1.0"

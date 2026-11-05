@@ -1,6 +1,3 @@
-# Defaults that hold for every environment. Per environment overrides live in
-# config/values/<environment>.yaml and are passed with -f.
-
 replicaCount: 2
 
 image:
@@ -9,8 +6,7 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
-# Sets the BreakHealth flag in the API, which makes /health return 503. Used
-# only to create a deliberately broken release for the recovery measurement.
+# Makes /health fail, to create a broken release for the recovery measurement.
 breakHealth: false
 
 service:
@@ -18,16 +14,11 @@ service:
 
 ingress:
   enabled: true
-  # Left empty here because the ingress controller differs per cluster (Traefik
-  # on k3d). Setting it in the environment file keeps the templates free of
-  # distribution specific fields.
+  # Set per environment, so the templates stay free of k3s specific fields.
   className: ""
-  # Empty host matches every host name, so the API answers on plain localhost.
+  # Empty matches every host.
   host: ""
 
-# Both probes hit /health. A failing readiness probe keeps a broken pod out of
-# the Service, and with maxUnavailable 0 the rollout stalls while the old pods
-# keep serving.
 probes:
   readiness:
     initialDelaySeconds: 2
@@ -38,8 +29,7 @@ probes:
     periodSeconds: 10
     failureThreshold: 3
 
-# How long a pod keeps serving after it is told to stop, so the ingress has
-# time to stop sending it traffic. Without it a rollout drops a few requests.
+# Gives the ingress time to stop routing to a pod before it shuts down.
 shutdownDelaySeconds: 5
 
 resources:

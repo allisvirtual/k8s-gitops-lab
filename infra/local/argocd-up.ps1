@@ -1,22 +1,12 @@
 #Requires -Version 7
 <#
 .SYNOPSIS
-    Installs ArgoCD on the local k3d cluster and registers the demo API.
-
-.DESCRIPTION
-    Installs the ArgoCD Helm chart with argocd-values.yaml, then applies the
-    Application in config/argocd/. From that point ArgoCD deploys whatever is
-    on master in config/, so nothing else has to be run to deploy.
-
-    Run cluster-up.ps1 first.
-
-.EXAMPLE
-    ./argocd-up.ps1
+    Installs ArgoCD on the local cluster and registers the demo API. Run cluster-up.ps1 first.
 #>
 
 $ErrorActionPreference = 'Stop'
 
-# Pinned so that every rebuild installs the same ArgoCD (app version v3.6.1).
+# ArgoCD v3.6.1, pinned for reproducible rebuilds.
 $chartVersion = '10.12.1'
 $valuesPath = Join-Path $PSScriptRoot 'argocd-values.yaml'
 $applicationPath = Join-Path $PSScriptRoot '..' '..' 'config' 'argocd' 'demo-api.yaml'
