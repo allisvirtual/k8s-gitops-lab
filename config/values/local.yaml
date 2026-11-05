@@ -1,7 +1,7 @@
 image:
   # Loaded with "k3d image import" until CI pushes to GHCR.
   repository: demo-api
-  tag: "0.1.0"
+  tag: "0.2.0"
 
 ingress:
   className: traefik
